@@ -808,3 +808,38 @@ def init(context, path, template, force, **kwargs):
         tmt.Test.create('/tests/example', 'shell', tree, force)
         tmt.Plan.create('/plans/example', 'full', tree, force)
         tmt.Story.create('/stories/example', 'full', tree, force)
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#  Status
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+@main.command()
+@click.pass_context
+@click.argument('path', default=tmt.utils.WORKDIR_ROOT)
+@click.option(
+    '-i', '--id', 'id_', help='Run id (name or directory path) to show status of.', metavar="ID")
+@click.option(
+    '--abandoned', is_flag=True, default=False,
+    help='List runs with active provision.')
+@click.option(
+    '--active', is_flag=True, default=False,
+    help='List runs where at least one step has not been finished.')
+@click.option(
+    '--finished', is_flag=True, default=False,
+    help='List all finished runs.')
+@verbose_debug_quiet
+def status(context, id_, path, abandoned, active, finished, **kwargs):
+    """
+    Show status of runs.
+
+    Lists past runs in the given directory filtered using options.
+    /var/tmp/tmt is used by default.
+
+    """
+    if [abandoned, active, finished].count(True) > 1:
+        raise tmt.utils.GeneralError(
+            "Options --abandoned, --active and --finished cannot be "
+            "used together.")
+    if not os.path.exists(path):
+        raise tmt.utils.GeneralError(f"Path {path} doesn't exist.")
