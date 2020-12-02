@@ -1,0 +1,18 @@
+discover:
+    how: fmf
+provision:
+    how: container
+prepare:
+    summary: Install fresh beakerlib
+    script: |
+        dnf install -y /usr/bin/{pod2man,patch}
+        cd /tmp
+        git clone https://github.com/beakerlib/beakerlib
+        cd beakerlib
+        git checkout sopos-yaml_metadata
+        cd src
+        make dictionary.vim docsman
+        cd ..
+        make build install
+execute:
+    how: tmt
